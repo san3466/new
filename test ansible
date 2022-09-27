@@ -1,0 +1,29 @@
+                                                                                                                         
+---
+- name: Ansible Test
+  hosts: test
+  become: yes
+
+
+
+  tasks:
+  - block:
+
+    - name: Install App
+      package:
+        name: app
+        state: latest
+    - name: Copy service
+      copy: src=/home/service.service dest=/lib/systemd/system/{{ item }}.service
+      with_sequence: start=1 end=30 stride=1 format=service-%01a
+    - name: Systemd start
+      systemd: state=started name="{{ item }}" enabled=yes daemon_reload=yes
+      with_sequence: start=1 end=30 stride=1 format=service-%01a
+
+    - name: Command
+      ansible.builtin.command: cmd1
+      register: cmd1
+    - command: cmd2 --arg=<<{{  cmd1.stdout }}>>
+
+    when:
+      - ansible_facts['distribution'] == "Ubuntu"
