@@ -1,0 +1,10 @@
+import os
+
+
+with open('datafile') as f:
+    if 'my-data' in f.read():
+        os.system('generate report')
+        os.system('export-reports')
+    else:
+        print("No data")
+        exit(0)
